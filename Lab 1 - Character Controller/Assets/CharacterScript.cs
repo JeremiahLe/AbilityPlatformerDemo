@@ -5,10 +5,16 @@ using UnityEngine;
 public class CharacterScript : MonoBehaviour
 {
     public float speed;
+    private float startingSpeed;
+    private float crouchSpeed;
     public float jumpForce;
     public float maxVelocity;
+    private float startingMaxVelocity;
     public float groundCheckRadius;
     public bool canJump = true;
+    public bool isCrouching = false;
+    public bool canDash = true;
+    public string direction;
 
     [SerializeField] private LayerMask platformsLayerMask;
     private Rigidbody2D rb;
@@ -19,12 +25,17 @@ public class CharacterScript : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        startingSpeed = speed;
+        maxVelocity = startingMaxVelocity;
+        crouchSpeed = startingSpeed / 1.4f;
     }
 
     private void Update()
     {
         Movement();
         Jumping();
+        Crouch();
+        Dash();
     }
 
     void Movement()
@@ -42,11 +53,20 @@ public class CharacterScript : MonoBehaviour
         {
             rb.velocity *= 0.99f;
         }
+
+        if (move.x < 0)
+        {
+            direction = "Left";
+        }
+        else if (move.x > 0)
+        {
+            direction = "Right";
+        }
     }
 
     void Jumping()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump"))
         {
             if (canJump)
             {
@@ -56,6 +76,51 @@ public class CharacterScript : MonoBehaviour
         }
 
         canJump = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, platformsLayerMask);
+    }
+
+    void Crouch()
+    {
+        isCrouching = Input.GetKey(KeyCode.S) && canJump != false || Input.GetAxisRaw("Vertical") < 0 && canJump != false;
+
+        if (isCrouching)
+        {
+            transform.localScale = new Vector3(1f, 0.5f, 1f);
+            speed = crouchSpeed;
+        }
+        else
+        {
+            speed = startingSpeed;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+    }
+
+    void Dash()
+    {
+        if (Input.GetKeyDown(KeyCode.Z) || Input.GetButtonDown("Fire1")) // Xbox "B"
+        {
+            if (canDash /*&& canJump*/)
+            {
+                if (direction == "Left")
+                {
+                    rb.AddForce(new Vector2(5.5f * -1, 0f), ForceMode2D.Impulse);
+                    canDash = false;
+                    Invoke("ResetDash", 0.6f);
+                }
+                else
+                if (direction == "Right")
+                {
+                    rb.AddForce(new Vector2(5.5f * 1, 0f), ForceMode2D.Impulse);
+                    canDash = false;
+                    Invoke("ResetDash", 0.6f);
+                }
+            }
+        }
+    }
+
+    void ResetDash(){
+        speed = startingSpeed;
+        maxVelocity = startingMaxVelocity;
+        canDash = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
