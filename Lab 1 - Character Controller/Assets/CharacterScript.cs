@@ -4,20 +4,29 @@ using UnityEngine;
 
 public class CharacterScript : MonoBehaviour
 {
-    public float speed;
+    [SerializeField]
+    private float speed = 30f;
     private float startingSpeed;
     private float crouchSpeed;
-    public float jumpForce;
-    public float maxVelocity;
+
+    [SerializeField]
+    private float jumpForce = 13f;
+    private float maxVelocity = 50f;
     private float startingMaxVelocity;
-    public float groundCheckRadius;
-    public bool canJump = true;
-    public bool isCrouching = false;
-    public bool canDash = true;
+
+    [SerializeField]
+    private float groundCheckRadius = .504f;
+
+    private bool canJump = true;
+    private bool isCrouching = false;
+    private bool canDash = true;
+
     public string direction;
 
-    [SerializeField] private LayerMask platformsLayerMask;
+    [SerializeField]
+    private LayerMask platformsLayerMask;
     private Rigidbody2D rb;
+
     public Transform groundCheck;
     public Transform startingPosition;
     public Transform checkPoint;
