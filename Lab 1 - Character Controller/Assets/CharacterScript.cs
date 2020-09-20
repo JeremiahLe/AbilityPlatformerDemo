@@ -49,11 +49,13 @@ public class CharacterScript : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
         }
 
+        // Velocity can't exceed max Velocity
         if (rb.velocity.sqrMagnitude > maxVelocity)
         {
             rb.velocity *= 0.99f;
         }
 
+        // Check player input to determine current direction for Dash
         if (move.x < 0)
         {
             direction = "Left";
@@ -117,12 +119,14 @@ public class CharacterScript : MonoBehaviour
         }
     }
 
+    // Reset Dash ability Cooldown
     void ResetDash(){
         speed = startingSpeed;
         maxVelocity = startingMaxVelocity;
         canDash = true;
     }
 
+    // Collision check with Out of Bounds 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.name == "ResetBounds"){
