@@ -16,6 +16,7 @@ public class ItemInitialization : MonoBehaviour
     void Start()
     {
         itemName.text = myItem.itemName;
+        myItem.isEquipped = false;
     }
 
     // Update is called once per frame
