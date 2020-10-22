@@ -4,6 +4,13 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+/*
+public class StatSystem : MonoBehaviour
+    {
+    enum Stats { speed, jumpForce, startingSpeed, startingJumpForce, startingSpeedNoItems}
+}
+*/
+
 public class CharacterScript : MonoBehaviour
 {
     #region Player Variables
@@ -17,6 +24,7 @@ public class CharacterScript : MonoBehaviour
     [SerializeField]
     private float jumpForce = 13f;
     private float startingJumpForce;
+    private float startingJumpForceNoItems;
     private float maxVelocity = 50f;
     private float startingMaxVelocity;
 
@@ -43,6 +51,7 @@ public class CharacterScript : MonoBehaviour
 
     #endregion
 
+    #region Other Components
     // Create Inventory of ScriptableObjects "ItemDefinitions"
     private List<ItemDefinitions> inventory;
     private List<string> itemList;
@@ -56,6 +65,7 @@ public class CharacterScript : MonoBehaviour
     public TextMeshProUGUI inventoryList;
     public TextMeshProUGUI currentItemDebug;
     public TextMeshProUGUI itemIndexDebug;
+    #endregion
 
     void Start()
     {
@@ -64,6 +74,7 @@ public class CharacterScript : MonoBehaviour
         startingSpeed = speed;
         startingSpeedNoItems = startingSpeed;
         startingJumpForce = jumpForce;
+        startingJumpForceNoItems = startingJumpForce;
 
         maxVelocity = startingMaxVelocity;
         crouchSpeed = startingSpeed / 1.4f;
@@ -418,4 +429,40 @@ public class CharacterScript : MonoBehaviour
             SceneManager.LoadScene("SampleScene");
         }
     }
+
+    // Stats Milestone 1
+
+    float ReturnStatValue(string returnStat)
+    {
+        if (returnStat == "Speed")
+            return speed;
+        else if (returnStat == "jumpForce")
+            return jumpForce;
+        else
+            return 0;
+    }
+
+    void AlterStatValue(string statToChange, float value)
+    {
+        if (statToChange == "Speed")
+        {
+            speed += value;
+            startingSpeed = speed;
+        }
+        else if (statToChange == "jumpForce")
+        {
+            jumpForce += value;
+            startingJumpForce = jumpForce;
+        }
+    }
+
+    void ResetStatValue(string statToReset)
+    {
+        if (statToReset == "Speed")
+            speed = startingSpeedNoItems;
+        else if (statToReset == "jumpForce")
+            jumpForce = startingJumpForceNoItems;
+    }
+
+    // Stats Milestone 1
 }
