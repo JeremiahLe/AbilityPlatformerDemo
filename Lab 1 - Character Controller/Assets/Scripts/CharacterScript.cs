@@ -28,6 +28,8 @@ public class CharacterScript : MonoBehaviour
     private float maxVelocity = 50f;
     private float startingMaxVelocity;
 
+    [SerializeField]
+    private float health = 20f;
     #endregion
 
     #region Movement and Mechanics
@@ -60,6 +62,7 @@ public class CharacterScript : MonoBehaviour
     public ItemDefinitions currentItem;
     public GameObject droppedItem;
 
+    public TextMeshProUGUI healthDebug;
     public TextMeshProUGUI speedDebug;
     public TextMeshProUGUI jumpDebug;
     public TextMeshProUGUI inventoryList;
@@ -181,7 +184,7 @@ public class CharacterScript : MonoBehaviour
     }
 
     // Reset Dash ability Cooldown
-    void ResetDash(){
+    void ResetDash() {
         speed = startingSpeed;
         maxVelocity = startingMaxVelocity;
         canDash = true;
@@ -190,7 +193,7 @@ public class CharacterScript : MonoBehaviour
     // Collision check with Out of Bounds 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.name == "ResetBounds"){
+        if (collision.gameObject.name == "ResetBounds") {
             transform.position = startingPosition.transform.position;
             rb.velocity = Vector2.zero;
         }
@@ -207,6 +210,12 @@ public class CharacterScript : MonoBehaviour
             //Inventory inventory = ScriptableObject.CreateInstance<Inventory>();
             //inventory.AddItem(item);
             AddItem(testItem);
+        }
+        else if (collision.gameObject.name == "TestDamageTrigger")
+        {
+            float damageTaken = -2f;
+            UpdateStat us = new UpdateStat(AlterStatValue);
+            us("Health", damageTaken, 0);
         }
     }
 
@@ -236,20 +245,30 @@ public class CharacterScript : MonoBehaviour
                 if (currentItem.isEquipped == false)
                 {
                     currentItem.isEquipped = true;
-                    //currentItem.itemName = (currentItem.itemName + " (Equipped)");
+
+                    /*currentItem.itemName = (currentItem.itemName + " (Equipped)");
                     speed += currentItem.speedModifier;
                     startingSpeed = speed;
                     jumpForce += currentItem.jumpModifier;
                     startingJumpForce = jumpForce;
+                    */
+
+                    UpdateStat us = new UpdateStat(AlterStatValue);
+                    us("SpeedAndJumpForce", currentItem.speedModifier, currentItem.jumpModifier);
                 }
                 else if (currentItem.isEquipped == true)
                 {
                     currentItem.isEquipped = false;
-                    //currentItem.itemName = (currentItem.itemName  " (Unequipped)");
+
+                    /*currentItem.itemName = (currentItem.itemName  " (Unequipped)");
                     speed -= currentItem.speedModifier;
                     startingSpeed = speed;
                     jumpForce -= currentItem.jumpModifier;
                     startingJumpForce = jumpForce;
+                    */
+
+                    UpdateStat us = new UpdateStat(AlterStatValue);
+                    us("SpeedAndJumpForce", -currentItem.speedModifier, -currentItem.jumpModifier);
                 }
             }
         }
@@ -273,7 +292,7 @@ public class CharacterScript : MonoBehaviour
                 }
 
                 // Instantiate Dropped Item
-                var go = Instantiate(droppedItem, new Vector2(this.transform.position.x + Random.Range(1.0f, 1.5f), this.transform.position.y + Random.Range(-0.1f, 0.8f)) , Quaternion.identity);
+                var go = Instantiate(droppedItem, new Vector2(this.transform.position.x + Random.Range(1.0f, 1.5f), this.transform.position.y + Random.Range(-0.1f, 0.8f)), Quaternion.identity);
 
                 go.GetComponent<ItemInitialization>().myItem = currentItem;
                 go.GetComponent<ItemInitialization>().myItem.itemName = currentItem.itemName;
@@ -343,6 +362,7 @@ public class CharacterScript : MonoBehaviour
     {
         speedDebug.text = "Speed: " + speed;
         jumpDebug.text = "Jumpforce: " + jumpForce;
+        healthDebug.text = "Health: " + health;
 
         if (currentItem != null)
         {
@@ -371,7 +391,7 @@ public class CharacterScript : MonoBehaviour
         {
             currentItemDebug.text = "Current Item: None ";
         }
-        
+
 
         if (inventory.Count <= 0)
         {
@@ -442,17 +462,36 @@ public class CharacterScript : MonoBehaviour
             return 0;
     }
 
-    void AlterStatValue(string statToChange, float value)
+    void AlterStatValue(string statToChange, float value, float value2)
     {
         if (statToChange == "Speed")
         {
             speed += value;
             startingSpeed = speed;
+
+            Debug.Log("Speed altered: Speed +" + value);
         }
         else if (statToChange == "jumpForce")
         {
             jumpForce += value;
             startingJumpForce = jumpForce;
+
+            Debug.Log("JumpForce altered: JumpForce +" + value);
+        }
+        else if (statToChange == "SpeedAndJumpForce")
+        {
+            speed += value;
+            startingSpeed = speed;
+            jumpForce += value2;
+            startingJumpForce = jumpForce;
+
+            Debug.Log("Speed and JumpForce altered: Speed +" + value + ", JumpForce +" + value2);
+        }
+        else if (statToChange == "Health")
+        {
+            health += value;
+       
+            Debug.Log("Health altered: Health +" + value);
         }
     }
 
@@ -464,5 +503,9 @@ public class CharacterScript : MonoBehaviour
             jumpForce = startingJumpForceNoItems;
     }
 
-    // Stats Milestone 1
+    // Stats Milestone 2
+
+    public delegate void UpdateStat(string statToChange, float value, float value2);
+        
+
 }
