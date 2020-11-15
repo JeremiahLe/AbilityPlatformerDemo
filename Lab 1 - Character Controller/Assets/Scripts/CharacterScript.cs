@@ -42,6 +42,7 @@ public class CharacterScript : MonoBehaviour
     private bool canDash = true;
 
     public string direction;
+    //private bool facingRight;
 
     [SerializeField]
     private LayerMask platformsLayerMask;
@@ -68,6 +69,8 @@ public class CharacterScript : MonoBehaviour
     public TextMeshProUGUI inventoryList;
     public TextMeshProUGUI currentItemDebug;
     public TextMeshProUGUI itemIndexDebug;
+
+    public Animator animator;
     #endregion
 
     void Start()
@@ -108,6 +111,13 @@ public class CharacterScript : MonoBehaviour
         move.x = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
         rb.velocity += Vector2.right * move;
 
+        // Animator Parameters
+        animator.SetFloat("horizontal", move.x);
+        animator.SetFloat("speed", Mathf.Abs(move.x));
+        animator.SetBool("canJump", canJump);
+        animator.SetBool("canDash", canDash);
+        animator.SetBool("isCrouching", isCrouching);
+
         if (move.x == 0 && rb.velocity != Vector2.zero)
         {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
@@ -123,12 +133,25 @@ public class CharacterScript : MonoBehaviour
         if (move.x < 0)
         {
             direction = "Left";
+            //facingRight = false;
+            //Flip();
         }
         else if (move.x > 0)
         {
             direction = "Right";
+            //facingRight = true;
+            //Flip();
         }
     }
+
+    /*
+    public void Flip()
+    {
+        Vector2 Scaler = transform.localScale;
+        Scaler.x *= -1;
+        transform.localScale = Scaler;
+    }
+    */
 
     void Jumping()
     {
@@ -150,13 +173,13 @@ public class CharacterScript : MonoBehaviour
 
         if (isCrouching)
         {
-            transform.localScale = new Vector3(1f, 0.5f, 1f);
+            //transform.localScale = new Vector3(1f, 0.5f, 1f);
             speed = crouchSpeed;
         }
         else
         {
             speed = startingSpeed;
-            transform.localScale = new Vector3(1, 1, 1);
+            //transform.localScale = new Vector3(1, 1, 1);
         }
     }
 
@@ -188,6 +211,7 @@ public class CharacterScript : MonoBehaviour
         speed = startingSpeed;
         maxVelocity = startingMaxVelocity;
         canDash = true;
+
     }
 
     // Collision check with Out of Bounds 
