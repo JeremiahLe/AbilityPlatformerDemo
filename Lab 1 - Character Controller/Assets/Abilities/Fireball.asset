@@ -16,6 +16,6 @@ MonoBehaviour:
   abilitySprite: {fileID: 21300000, guid: 99791317023a0da4f8231bb4c2008469, type: 3}
   abilitySpeed: 7
   abilityDamage: 5
-  abilityCooldown: 3
+  abilityCooldown: 1
   offCooldown: 1
-  isLearned: 0
+  isLearned: 1

@@ -55,6 +55,7 @@ public class AbilityManager : MonoBehaviour
         UpdateUI();
         CycleAvailableAbilities();
         LearnAbility();
+        UseAbility();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -64,6 +65,11 @@ public class AbilityManager : MonoBehaviour
             Destroy(collision.gameObject);
             ScriptableAbility testAbility = collision.gameObject.GetComponent<AbilityInitialization>().myAbility; // adding abilities to tree
             AddAbility(testAbility);
+        }
+        else if (collision.gameObject.tag == "Skillpoint")
+        {
+            Destroy(collision.gameObject);
+            skillPoints += 1;
         }
     }
 
@@ -101,14 +107,73 @@ public class AbilityManager : MonoBehaviour
 
     public void LearnAbility()
     {
-        if (Input.GetKeyDown(KeyCode.C) && gameObject.GetComponent<AbilityManager>().skillTreeVisible != false || Input.GetButtonDown("Fire2") && gameObject.GetComponent<AbilityManager>().skillTreeVisible != false) // Xbox button "Y"
+        if (Input.GetKeyDown(KeyCode.C) && gameObject.GetComponent<AbilityManager>().skillTreeVisible != false || Input.GetButtonDown("Fire2") && gameObject.GetComponent<AbilityManager>().skillTreeVisible != false) // Xbox button "Y" ~ check is the skill tree is visible
         {
-            if (currentAbility.isLearned != true && skillPoints < 0)
+            if (currentAbility.isLearned != true && skillPoints > 0) // is the ability learnable and do you have enough skillpoints?
             {
-                currentAbility.isLearned = true;
                 skillPoints -= 1;
+                currentAbility.isLearned = true;
             }
         }
+    }
+
+    public void UseAbility()
+    {
+        if (Input.GetButtonDown("RightTrigger") || (Input.GetKeyDown(KeyCode.Return)))
+        {
+            if (currentAbility != null && currentAbility.isLearned == true && currentAbility.offCooldown == true) // do you have an ability, is it learned, and is it off cd?
+            {
+
+                Vector2 abilityPos = transform.position;
+
+                if (gameObject.GetComponent<CharacterScript>().direction == "Left")
+                {
+                    abilityPos += new Vector2(-1f, 0f);
+
+                    var ability = Instantiate(abilityProjectile, abilityPos, Quaternion.identity);
+
+                    currentAbility.offCooldown = false;
+                    Invoke("ResetCD", currentAbility.abilityCooldown);
+
+                    //ability.GetComponent<AbilityInitialization>().myAbility = currentAbility;
+                    //ability.GetComponent<AbilityInitialization>().abilitySprite = currentAbility.abilitySprite;
+
+                    ability.GetComponent<ProjectileScript>().speed = currentAbility.abilitySpeed;
+                    ability.GetComponent<SpriteRenderer>().sprite = currentAbility.abilitySprite;
+                    ability.GetComponent<ProjectileScript>().velX = -.75f;
+                    ability.GetComponent<ProjectileScript>().abilityDamage = currentAbility.abilityDamage;
+                    //ability.GetComponent<ProjectileScript>().velY = -.01f;
+
+                    Debug.Log("Shot a projectile!");
+                }
+                else
+                if (gameObject.GetComponent<CharacterScript>().direction == "Right")
+                {
+                    abilityPos += new Vector2(+1f, 0f);
+
+                    var ability = Instantiate(abilityProjectile, abilityPos, Quaternion.identity);
+
+                    currentAbility.offCooldown = false;
+                    Invoke("ResetCD", currentAbility.abilityCooldown);
+
+                    //ability.GetComponent<AbilityInitialization>().myAbility = currentAbility;
+                    //ability.GetComponent<AbilityInitialization>().abilitySprite = currentAbility.abilitySprite;
+
+                    ability.GetComponent<ProjectileScript>().speed = currentAbility.abilitySpeed;
+                    ability.GetComponent<SpriteRenderer>().sprite = currentAbility.abilitySprite;
+                    ability.GetComponent<ProjectileScript>().velX = +.75f;
+                    ability.GetComponent<ProjectileScript>().abilityDamage = currentAbility.abilityDamage;
+                    //ability.GetComponent<ProjectileScript>().velY = -.01f;
+
+                    Debug.Log("Shot a projectile!");
+                }
+            }
+        }
+    }
+
+    void ResetCD()
+    {
+        currentAbility.offCooldown = true;
     }
 
     private void SelectAbility(int index)
@@ -132,7 +197,7 @@ public class AbilityManager : MonoBehaviour
         {
             debugAvailableAbilityList.text = "";
             foreach (ScriptableAbility ability in availableAbilities) // Add each ability to the text
-                debugAvailableAbilityList.text += ability.abilityName.ToString() + "\n";
+                debugAvailableAbilityList.text += ability.abilityName.ToString() + " - 1 SP, " + ability.abilityDamage.ToString() + " dmg" + "\n";
         }
 
         if (Input.GetKeyDown(KeyCode.P)) // or "Start" to open Skill Tree Window (Canvas)
@@ -150,7 +215,7 @@ public class AbilityManager : MonoBehaviour
             }
         } // opening Skill Tree
 
-        // current ability
+        // Current ability Tracker
 
         if (currentAbility != null)
         {

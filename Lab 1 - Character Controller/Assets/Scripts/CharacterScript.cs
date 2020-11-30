@@ -173,13 +173,13 @@ public class CharacterScript : MonoBehaviour
 
         if (isCrouching)
         {
-            //transform.localScale = new Vector3(1f, 0.5f, 1f);
+            transform.localScale = new Vector3(1f, 0.8f, 1f);
             speed = crouchSpeed;
         }
         else
         {
             speed = startingSpeed;
-            //transform.localScale = new Vector3(1, 1, 1);
+            transform.localScale = new Vector3(1, 1, 1);
         }
     }
 

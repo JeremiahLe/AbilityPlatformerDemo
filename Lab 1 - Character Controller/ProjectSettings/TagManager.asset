@@ -7,6 +7,8 @@ TagManager:
   - Item
   - TestDamageTrigger
   - Ability
+  - Projectile
+  - Skillpoint
   layers:
   - Default
   - TransparentFX
@@ -17,7 +19,7 @@ TagManager:
   - 
   - 
   - Platform
-  - 
+  - Projectile
   - 
   - 
   - 
