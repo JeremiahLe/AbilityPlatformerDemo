@@ -262,7 +262,7 @@ public class CharacterScript : MonoBehaviour
 
     public void ToggleEquip()
     {
-        if (Input.GetKeyDown(KeyCode.C) || Input.GetButtonDown("Fire2")) // Xbox button "Y"
+        if (Input.GetKeyDown(KeyCode.C) && gameObject.GetComponent<AbilityManager>().skillTreeVisible != true || Input.GetButtonDown("Fire2") && gameObject.GetComponent<AbilityManager>().skillTreeVisible != true) // Xbox button "Y"
         {
             if (currentItem != null)
             {
@@ -350,7 +350,7 @@ public class CharacterScript : MonoBehaviour
 
     public void CycleInventory()
     {
-        if (inventory.Count > 0 && currentItem != null && currentInventoryIndex != -1)
+        if (inventory.Count > 0 && currentItem != null && currentInventoryIndex != -1 && gameObject.GetComponent<AbilityManager>().skillTreeVisible != true)
         {
             if (Input.GetButtonDown("LB") || (Input.GetKeyDown(KeyCode.Q))) // joystick 4
             {
